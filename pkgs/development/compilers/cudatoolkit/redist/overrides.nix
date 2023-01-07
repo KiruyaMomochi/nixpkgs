@@ -36,6 +36,11 @@ in (lib.filterAttrs (attr: _: (prev ? "${attr}")) {
     prev.libcurand
   ];
 
+  cuda_gdb = prev.cuda_gdb.overrideAttrs (oldAttrs: {
+    buildInputs = oldAttrs.buildInputs
+    ++ lib.optionals (lib.versionAtLeast prev.cuda_gdb.version "12.0.90") [ pkgs.gmp ];
+  });
+
   nsight_compute = prev.nsight_compute.overrideAttrs (oldAttrs: {
     nativeBuildInputs = oldAttrs.nativeBuildInputs
     ++ (if (lib.versionOlder prev.nsight_compute.version "2022.2.0")
@@ -44,7 +49,18 @@ in (lib.filterAttrs (attr: _: (prev ? "${attr}")) {
     buildInputs = oldAttrs.buildInputs
     ++ (if (lib.versionOlder prev.nsight_compute.version "2022.2.0")
        then [ pkgs.qt5.qtwebview ]
-       else [ pkgs.qt6.qtwebview ]);
+       else [ pkgs.qt6.qtwebview ])
+    ++ lib.optionals (lib.versionAtLeast prev.nsight_compute.version "2022.4.0") [
+      pkgs.ucx
+      pkgs.qt6.qtwayland
+      pkgs.curl
+      pkgs.libibumad
+      pkgs.e2fsprogs
+      pkgs.rdma-core
+    ];
+
+    # libcuda needs to be resolved during runtime
+    autoPatchelfIgnoreMissingDeps = [ "libcuda.so.1" "libcudart.so.1" ];
   });
 
   nsight_systems = prev.nsight_systems.overrideAttrs (oldAttrs: {
