@@ -26,6 +26,7 @@ args@
 , unixODBC
 , xorg
 , zlib
+, gmp # gmp is required by cuda-gdb
 }:
 
 stdenv.mkDerivation rec {
@@ -58,7 +59,7 @@ stdenv.mkDerivation rec {
   runtimeDependencies = [
     ncurses5 expat python27 zlib glibc
     xorg.libX11 xorg.libXext xorg.libXrender xorg.libXt xorg.libXtst xorg.libXi xorg.libXext
-    gtk2 glib fontconfig freetype unixODBC alsa-lib
+    gtk2 glib fontconfig freetype unixODBC alsa-lib gmp
   ];
 
   unpackPhase = ''
