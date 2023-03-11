@@ -19,33 +19,23 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "AOSC-Dev";
     repo = "ciel-rs";
-    rev = "02eac316765f27239b7b17176df812da702895cd";
+    rev = "refs/tags/v{version}";
     hash = "sha256-WzrOCiIOdg3fBLKNjCPlr/XGrXC2424hO1nrwWXjx2A=";
   };
 
-  nativeBuildInputs = [ pkg-config zlib ];
+  cargoHash = "sha256-qGWRw71jrS7sl9+SYVff6aM6tXAFu3NGWWZkJ/vhwaY=";
 
-  doCheck = false;
+  nativeBuildInputs = [ pkg-config ];
 
-  buildInputs = [ systemd dbus openssl libssh2 libgit2 xz ];
-
-  cargoLock = {
-    lockFile = fetchurl {
-      url = "https://raw.githubusercontent.com/AOSC-Dev/ciel-rs/02eac316765f27239b7b17176df812da702895cd/Cargo.lock";
-      sha256 = "sha256-hFjKf3psCj9ntQaKpVjeIhnWh5EzKphsTr82LXZ9XsA=";
-    };
-    outputHashes = {
-      "libmount-0.1.15" = "sha256-g3UbVVQjbZ82Nunat5a9RKwd73Y/mMtiCfAifr6k00U=";
-    };
-  };
+  buildInputs = [ systemd dbus openssl libssh2 libgit2 xz zlib ];
 
   postInstall = ''
     mv -v "$out/bin/ciel-rs" "$out/bin/ciel"
   '';
 
   meta = with lib; {
-    description = "A tool for controlling multi-layer file systems and containers.";
-    homepage = "https://www.rustup.rs/";
+    description = "A tool for controlling AOSC OS packaging environments using multi-layer filesystems and containers.";
+    homepage = "https://github.com/AOSC-Dev/ciel-rs";
     license = licenses.mit;
     platforms = platforms.unix;
     maintainers = with maintainers; [ yisuidenghua ];
