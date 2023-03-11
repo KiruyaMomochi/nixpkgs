@@ -31,6 +31,9 @@ rustPlatform.buildRustPackage rec {
 
   postInstall = ''
     mv -v "$out/bin/ciel-rs" "$out/bin/ciel"
+    env PREFIX="$out/" ./install-assets.sh
+    # https://github.com/AOSC-Dev/ciel-rs/pull/15
+    mv -v $out/share/fish/completions $out/share/fish/vendor_completions.d
   '';
 
   meta = with lib; {
