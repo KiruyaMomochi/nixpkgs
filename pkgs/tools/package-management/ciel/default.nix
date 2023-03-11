@@ -10,6 +10,7 @@
 , pkg-config
 , libgit2
 , zlib
+, bash
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -27,12 +28,23 @@ rustPlatform.buildRustPackage rec {
 
   nativeBuildInputs = [ pkg-config ];
 
-  buildInputs = [ systemd dbus openssl libssh2 libgit2 xz zlib ];
+  # ciel has pulgins which is actually bash scripts.
+  # Therefore, bash is required for plugins to work.
+  buildInputs = [ bash systemd dbus openssl libssh2 libgit2 xz zlib ];
+
+  patches = [
+    # FIXME: remove patch below after https://github.com/AOSC-Dev/ciel-rs/pull/16 is merged
+    ./0001-use-canonicalize-path-to-find-libexec.patch
+  ];
+
+  postPatch = ''
+    patchShebangs --build ./install-assets.sh
+  '';
 
   postInstall = ''
     mv -v "$out/bin/ciel-rs" "$out/bin/ciel"
     env PREFIX="$out/" ./install-assets.sh
-    # https://github.com/AOSC-Dev/ciel-rs/pull/15
+    # FIXME: remove line below after https://github.com/AOSC-Dev/ciel-rs/pull/15 merged
     mv -v $out/share/fish/completions $out/share/fish/vendor_completions.d
   '';
 

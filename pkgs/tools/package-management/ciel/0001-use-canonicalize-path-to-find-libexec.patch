@@ -1,0 +1,55 @@
+From 17f41538ed1057e855540f5abef7faf6ea4abf5c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E7=99=BE=E5=9C=B0=20=E5=B8=8C=E7=95=99=E8=80=B6?=
+ <65301509+KiruyaMomochi@users.noreply.github.com>
+Date: Sun, 12 Mar 2023 01:01:10 +0800
+Subject: [PATCH] cli,completions: use canonicalize path to find libexec
+ location
+
+---
+ completions/ciel.bash | 2 +-
+ completions/ciel.fish | 2 +-
+ src/cli.rs            | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/completions/ciel.bash b/completions/ciel.bash
+index 733cfda..e5efb5f 100644
+--- a/completions/ciel.bash
++++ b/completions/ciel.bash
+@@ -29,7 +29,7 @@ _ciel_list_packages() {
+ }
+ 
+ _ciel_list_plugins() {
+-    local CIEL="$(command -v ciel)"
++    local CIEL="$(readlink -f $(command -v ciel))"
+     [ -z "$CIEL" ] && return
+     local PLUGIN_DIR="$(dirname $CIEL)/../libexec/ciel-plugin"
+     find "$PLUGIN_DIR" -maxdepth 1 -mindepth 1 -type f -name 'ciel-*' -printf '%f\n' | cut -d'-' -f2-
+diff --git a/completions/ciel.fish b/completions/ciel.fish
+index 3c70817..56a9a84 100644
+--- a/completions/ciel.fish
++++ b/completions/ciel.fish
+@@ -30,7 +30,7 @@ function __ciel_list_packages
+ end
+ 
+ function __ciel_list_plugins
+-    set ciel_path (command -v ciel)
++    set ciel_path (readlink -f (command -v ciel))
+     set ciel_plugin_dir (dirname $ciel_path)"/../libexec/ciel-plugin"
+     find "$ciel_plugin_dir" -maxdepth 1 -mindepth 1 -type f -printf '%f\t-Ciel plugin-\n' | cut -d'-' -f2-
+ end
+diff --git a/src/cli.rs b/src/cli.rs
+index b6d7d24..56671b1 100644
+--- a/src/cli.rs
++++ b/src/cli.rs
+@@ -6,7 +6,7 @@ pub const GIT_TREE_URL: &str = "https://github.com/AOSC-Dev/aosc-os-abbs.git";
+ 
+ /// List all the available plugins/helper scripts
+ fn list_helpers() -> Result<Vec<String>> {
+-    let exe_dir = std::env::current_exe()?;
++    let exe_dir = std::env::current_exe().and_then(std::fs::canonicalize)?;
+     let exe_dir = exe_dir.parent().ok_or_else(|| anyhow!("Where am I?"))?;
+     let plugins_dir = exe_dir.join("../libexec/ciel-plugin/").read_dir()?;
+     let plugins = plugins_dir
+-- 
+2.39.2
+
