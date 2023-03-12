@@ -52,7 +52,7 @@ rustPlatform.buildRustPackage rec {
     description = "A tool for controlling AOSC OS packaging environments using multi-layer filesystems and containers.";
     homepage = "https://github.com/AOSC-Dev/ciel-rs";
     license = licenses.mit;
-    platforms = platforms.unix;
+    platforms = platforms.linux;
     maintainers = with maintainers; [ yisuidenghua ];
   };
 }
