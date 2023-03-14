@@ -10170,6 +10170,8 @@ with pkgs;
 
   netbox = callPackage ../servers/web-apps/netbox { };
 
+  netbox_3_3 = callPackage ../servers/web-apps/netbox/3.3.nix { };
+
   netcat = libressl.nc;
 
   netcat-gnu = callPackage ../tools/networking/netcat { };
